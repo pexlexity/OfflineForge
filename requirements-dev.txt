@@ -1,0 +1,6 @@
+pytest
+click
+flask
+requests
+python-dotenv
+zstandard

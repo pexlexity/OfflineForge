@@ -1,58 +1,32 @@
-# OfflinePack — Portable Offline Dependency Packs
+# OfflineForge
 
-OfflinePack is a CLI tool to generate portable offline packages of project dependencies for common ecosystems (MVP: npm + pip). It collects dependencies, downloads their artifacts, produces a reproducible pack (tar.gz) and a simple installer stub so the project can be restored or installed in an environment without internet access.
+**OfflineForge** is a universal tool for creating portable offline packages of dependencies and environments
+(npm/pip/apt/containers/… ) for development, deployment and recovery of systems without internet access.
 
-Why OfflinePack 🤷‍♂️
-- Make projects reproducible in air-gapped or low-connectivity environments.
-- Prepare offline bundles for hackathons, training labs, or branches with blocked networks.
-- Save time for SREs and devs who need portable, verifiable dependency archives.
+---
 
-Key features (MVP) 🧪
-- Read package.json and requirements.txt
-- Resolve top-level dependencies (npm + pip) and fetch artifact files (npm tarballs and pip wheels/sdists)
-- Create a tar.gz bundle containing:
-  - packages/ (downloaded artifacts)
-  - manifest.json (pack metadata and checksums)
-  - install.sh (simple installer to install from the local files)
-- Basic checksum validation (sha256) and manifest recording
+## What the project does (MVP)
+- CLI accepting `package.json` and `requirements.txt`.
+- Recursive dependency resolution for npm and pip (MVP: downloading packages and wheels).
+- Building a portable `.tar.zst` archive with `manifest.json` and `install.sh` for offline recovery.
+- Basic integrity validation (sha256) and metadata.
 
-Quick start (example) 🟩
+---
 
-1. Install Go (1.20+), clone repository, build:
-   go build -o offlinepack ./cmd/offlinepack
+## Quick start (local, dev)
 
-2. Prepare a project with package.json and/or requirements.txt
+### Requirements
+- Python 3.8+
+- pip
+- GNU tar, zstd (or `python-zstandard`) for packaging (in the examples `tar` + `zstd` is used if available)
+- (optional) Node.js/npm for testing npm functionality
 
-3. Create an offline pack:
-   ./offlinepack pack --project /path/to/project --out /path/to/out/offline-pack.tar.gz
+### Installation (local dev environment)
+```bash
+# Create and activate venv
+python3 -m venv .venv
+source .venv/bin/activate
 
-4. On the offline machine, extract and run installer:
-   tar -xzf offline-pack.tar.gz
-   ./install.sh
-
-Usage (CLI) 🟩
-- pack: read manifests and produce offline pack
-  ./offlinepack pack --project <project-dir> --out <output-file>
-
-Flags
-- --project : path to project folder (contains package.json and/or requirements.txt)
-- --out     : output archive path (defaults to offline-pack.tar.gz)
-- --tmp     : temporary working directory (optional)
-
-Installer (generated) 🟩
-- install.sh will:
-  - Install pip packages from local packages/ directory using pip --no-index --find-links
-  - Install npm packages from local tarballs via npm install ./packages/*.tgz (best-effort)
-  - Provide instructions in case of manual steps
-
-
-Example workflow 🔬
-
-1. Developer runs offlinepack pack -> generates offline-pack.tar.gz
-
-2. Copy the pack to offline host (USB / internal file server)
-
-3. Extract and run install.sh to restore runtime dependencies
-
-Contact / Support
-- Open an issue in the GitHub repository for bugs or feature requests.
+# Install dev dependencies
+pip install -U pip setuptools wheel
+pip install -r requirements-dev.txt
